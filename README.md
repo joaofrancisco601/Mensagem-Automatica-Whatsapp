@@ -1,29 +1,33 @@
-# Mensagem-Automatica-Whatsapp
-#Mensagem Automatica Whatsapp
-import pandas as pd
-import urllib.parse
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import time
+# Mensagem Automática WhatsApp
 
-contatos_df = pd.read_excel("Enviar.xlsx")
+Envia mensagens automáticas via WhatsApp Web usando Selenium.
 
-navegador = webdriver.Chrome()
-navegador.get("https://web.whatsapp.com/")
-time.sleep(40)
+## Requisitos
 
-while len(navegador.find_elements_by_xpath('//*[@id="pane-side"]')) < 1:
-    time.sleep(1)
+```bash
+pip install -r requirements.txt
+```
 
-for i, mensagem in enumerate(contatos_df['Mensagem']):
-    pessoa = contatos_df.loc[i, "Pessoa"]
-    numero = contatos_df.loc[i, "Número"]
-    texto = urllib.parse.quote(f"Oi {pessoa}! {mensagem}")
-    link = f"https://web.whatsapp.com/send?phone={numero}&text={texto}"
-    navegador.get(link)
-    time.sleep(5)  
-    while len(navegador.find_elements_by_xpath('//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div[2]/div[1]/p')) < 1:
-        time.sleep(1)
-    navegador.find_element_by_xpath('//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div[2]/div[1]/p').send_keys(Keys.ENTER)
-    
-    time.sleep(10)
+Também é necessário ter o [ChromeDriver](https://chromedriver.chromium.org/) instalado e compatível com a versão do seu Chrome.
+
+## Como usar
+
+1. Crie o arquivo `Enviar.xlsx` com as colunas:
+   - **Pessoa** — nome do destinatário
+   - **Número** — número com código do país (ex: `5511999999999`)
+   - **Mensagem** — texto a enviar
+
+2. Execute o script:
+
+```bash
+python enviar_mensagem.py
+```
+
+3. Escaneie o QR Code no WhatsApp Web quando solicitado.
+
+A sessão é salva em `./sessao_whatsapp`, então nas próximas execuções o login pode não ser necessário.
+
+## Observações
+
+- O número deve estar no formato internacional sem `+` ou espaços (ex: `5511999999999`).
+- O script aguarda até 40 segundos para o QR Code ser escaneado.
